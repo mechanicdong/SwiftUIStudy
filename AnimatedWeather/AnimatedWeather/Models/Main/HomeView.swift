@@ -6,33 +6,54 @@
 //
 
 import SwiftUI
+import BottomSheet
+
+enum BottomSheetPosition: CGFloat, CaseIterable {
+    case top = 0.83 // 702/844
+    case middle = 0.385 //325/844
+}
 
 struct HomeView: View {
+    @State var bottomSheetPosition: BottomSheetPosition = .middle
+    
     var body: some View {
-        ZStack {
-            Color.background
-                .ignoresSafeArea()
-            
-            Image("Background")
-                .resizable()
-                .ignoresSafeArea()
-            
-            Image("House")
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, 257)
-            
-            VStack(spacing: -10) {
-                Text("서울")
-                    .font(.largeTitle)
+        NavigationView {
+            ZStack {
+                Color.background
+                    .ignoresSafeArea()
                 
-                VStack {
-                    Text(attributedString)
-                    Text("H:24°    L:18°")
-                        .font(.title3.weight(.semibold))
+                Image("Background")
+                    .resizable()
+                    .ignoresSafeArea()
+                
+                Image("House")
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 257)
+                
+                VStack(spacing: -10) {
+                    Text("서울")
+                        .font(.largeTitle)
+                    
+                    VStack {
+                        Text(attributedString)
+                        Text("H:24°    L:18°")
+                            .font(.title3.weight(.semibold))
+                    }
+                    Spacer()
                 }
-                Spacer()
+                .padding(.top, 51)
+                
+                BottomSheetView(position: $bottomSheetPosition) {
+                    
+                } content: {
+                    ForecastView()
+                }
+                
+                TabBar(action: {
+                    bottomSheetPosition = .top
+                })
             }
-            .padding(.top, 51)
+            .navigationBarHidden(true)
         }
     }
     
