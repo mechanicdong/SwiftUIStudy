@@ -15,45 +15,52 @@ enum BottomSheetPosition: CGFloat, CaseIterable {
 
 struct HomeView: View {
     @State var bottomSheetPosition: BottomSheetPosition = .middle
+    @State var bottomSheetRanslation: CGFloat = BottomSheetPosition.middle.rawValue
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color.background
-                    .ignoresSafeArea()
-                
-                Image("Background")
-                    .resizable()
-                    .ignoresSafeArea()
-                
-                Image("House")
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    .padding(.top, 257)
-                
-                VStack(spacing: -10) {
-                    Text("서울")
-                        .font(.largeTitle)
+            GeometryReader { geometry in
+                let screenHeight = geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
+                ZStack {
+                    Color.background
+                        .ignoresSafeArea()
                     
-                    VStack {
-                        Text(attributedString)
-                        Text("H:24°    L:18°")
-                            .font(.title3.weight(.semibold))
+                    Image("Background")
+                        .resizable()
+                        .ignoresSafeArea()
+                    
+                    Image("House")
+                        .frame(maxHeight: .infinity, alignment: .top)
+                        .padding(.top, 257)
+                    
+                    VStack(spacing: -10) {
+                        Text("서울")
+                            .font(.largeTitle)
+                        
+                        VStack {
+                            Text(attributedString)
+                            Text("H:24°    L:18°")
+                                .font(.title3.weight(.semibold))
+                        }
+                        Spacer()
                     }
-                    Spacer()
-                }
-                .padding(.top, 51)
-                
-                BottomSheetView(position: $bottomSheetPosition) {
+                    .padding(.top, 51)
                     
-                } content: {
-                    ForecastView()
+                    BottomSheetView(position: $bottomSheetPosition) {
+                        Text(bottomSheetRanslation.formatted())
+                    } content: {
+                        ForecastView()
+                    }
+                    .onBottomSheetDrag { translation in
+                        bottomSheetRanslation = translation / screenHeight
+                    }
+                    
+                    TabBar(action: {
+                        bottomSheetPosition = .top
+                    })
                 }
-                
-                TabBar(action: {
-                    bottomSheetPosition = .top
-                })
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)
         }
     }
     
