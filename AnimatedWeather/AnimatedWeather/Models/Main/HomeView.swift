@@ -15,12 +15,18 @@ enum BottomSheetPosition: CGFloat, CaseIterable {
 
 struct HomeView: View {
     @State var bottomSheetPosition: BottomSheetPosition = .middle
-    @State var bottomSheetRanslation: CGFloat = BottomSheetPosition.middle.rawValue
+    @State var bottomSheetTranslation: CGFloat = BottomSheetPosition.middle.rawValue
+    
+    var bottomSheetTranslationProrated: CGFloat {
+        (bottomSheetTranslation - BottomSheetPosition.middle.rawValue) / (BottomSheetPosition.top.rawValue - BottomSheetPosition.middle.rawValue )
+    }
     
     var body: some View {
         NavigationView {
             GeometryReader { geometry in
                 let screenHeight = geometry.size.height + geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
+                let imageOffset = screenHeight + 36
+                
                 ZStack {
                     Color.background
                         .ignoresSafeArea()
@@ -28,12 +34,14 @@ struct HomeView: View {
                     Image("Background")
                         .resizable()
                         .ignoresSafeArea()
+                        .offset(y: -bottomSheetTranslationProrated * imageOffset)
                     
                     Image("House")
                         .frame(maxHeight: .infinity, alignment: .top)
                         .padding(.top, 257)
+                        .offset(y: -bottomSheetTranslationProrated * imageOffset)
                     
-                    VStack(spacing: -10) {
+                    VStack(spacing: -10 * (1 - bottomSheetTranslationProrated)) {
                         Text("서울")
                             .font(.largeTitle)
                         
@@ -45,14 +53,15 @@ struct HomeView: View {
                         Spacer()
                     }
                     .padding(.top, 51)
+                    .offset(y: -bottomSheetTranslationProrated * 46)
                     
                     BottomSheetView(position: $bottomSheetPosition) {
-                        Text(bottomSheetRanslation.formatted())
+                        Text(bottomSheetTranslationProrated.formatted())
                     } content: {
                         ForecastView()
                     }
                     .onBottomSheetDrag { translation in
-                        bottomSheetRanslation = translation / screenHeight
+                        bottomSheetTranslation = translation / screenHeight
                     }
                     
                     TabBar(action: {
